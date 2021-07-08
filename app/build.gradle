@@ -1,0 +1,134 @@
+buildscript {
+    apply from: "../dependencies.gradle"
+}
+
+plugins {
+    id("com.android.application")
+    id("kotlin-android")
+    id("kotlin-kapt")
+}
+
+android {
+    compileSdkVersion configs.compileSdk
+    buildToolsVersion configs.buildToolsVersion
+
+    defaultConfig {
+        applicationId configs.applicationId
+        minSdkVersion configs.minSdk
+        targetSdkVersion configs.targetSdkVersion
+        versionCode configs.versionCode
+        versionName configs.versionName
+        multiDexEnabled true
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+//        buildConfigField "String", "BASE_URL", '"https://currency-converter5.p.rapidapi.com/currency/"'
+        buildConfigField "String", "BASE_URL", '"https://random-data-api.com/api/"'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+    buildFeatures {
+        dataBinding true
+        viewBinding true
+    }
+
+    signingConfigs {
+        release {}
+        debug {}
+    }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+            testCoverageEnabled true
+            debuggable true
+        }
+
+        release {
+            minifyEnabled false
+            shrinkResources false
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), file("proguard-rules.pro")
+        }
+    }
+
+    flavorDimensions "notSet"
+    productFlavors {
+        dev {
+            dimension "notSet"
+            manifestPlaceholders = [usesCleartextTraffic: "false"]
+            signingConfig signingConfigs.debug
+        }
+        product {
+            dimension "notSet"
+            manifestPlaceholders = [usesCleartextTraffic: "false"]
+            signingConfig signingConfigs.release
+        }
+    }
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+//            def flavor = variant.flavorName
+//            def buildType = variant.buildType.name.capitalize()
+//            def versionName = variant.versionName
+//            def versionCode = variant.versionCode
+//            def formattedDate = new Date().format("yyMMdd.HHmm")
+            outputFileName = "application.apk"
+        }
+    }
+
+
+    bundle {
+        density { enableSplit true }
+        abi { enableSplit true }
+        language { enableSplit false }
+    }
+}
+
+dependencies {
+
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+
+    implementation "com.android.support:multidex:1.0.3"
+    implementation libs.protoDatastore
+    implementation libs.activityKtx
+    implementation libs.fragmentKtx
+    implementation libs.constraintlayout
+    implementation libs.materialDesign
+    implementation libs.swiperefreshlayout
+//    implementation libs.flexbox
+    implementation libs.navigationFragment
+    implementation libs.navigationUi
+
+    implementation libs.lifecycleViewModel
+    implementation libs.lifecycleLiveData
+
+    implementation libs.glide
+    kapt libs.glideCompiler
+
+    implementation libs.coroutinesCore
+    implementation libs.coroutinesAndroid
+
+    implementation libs.dagger
+    implementation libs.daggerAndroidSupport
+    kapt libs.daggerCompiler
+    kapt libs.daggerAndroidProcessor
+
+    implementation libs.retrofit2
+    implementation libs.retrofit2ConverterJson
+    implementation libs.okhttp3
+    implementation libs.okhttp3LoggingInterceptor
+
+    implementation libs.sdp
+
+    debugImplementation libs.leakcanary
+
+    testImplementation libs.junit
+    androidTestImplementation libs.androidJunit
+    androidTestImplementation libs.espressoCore
+
+}
